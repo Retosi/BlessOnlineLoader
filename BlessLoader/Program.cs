@@ -14,6 +14,7 @@ namespace BlessLoader
         private static string consoleMainPrompt = "Detection Mode Options [ 1 , 2 ]\nInput 1 for game autodetection\nInput 2 for manual mode\nThen press enter: ";
         private static string consoleManualPrompt = "Enter the path of your Bless Online download folder\nExample: C:\\Program Files (x86)\\Steam\\steamapps\\common\\Bless Online\\ \nThen press enter: ";
         private static string consoleStartPrompt = "Starting the game...\n";
+        private static string ConsoleSteamFailed = "Steam Check: Failed\nPlease launch steam and reload the tool.";
         //
         private static string defaultSteamPath = @"C:\Program Files (x86)\Steam\Steam.exe";
         private static string defaultSteamGamesPath = @"C:\Program Files (x86)\Steam\steamapps\common";
@@ -30,7 +31,19 @@ namespace BlessLoader
         // Setup
         private static void Init()
         {
-            HandleInput_Options();
+            // Detect If Steam Is Running
+            if (SteamDetection())
+            {
+                // Steam Is Running : Prompt And Handle Input Options
+                HandleInput_Options();
+            }
+            else
+            {
+                // Steam Is Not Running
+                ConsoleWrite(ConsoleSteamFailed);
+                // Wait For Input
+                Console.ReadLine();
+            }
         }
 
         // Prompt Input
@@ -155,6 +168,24 @@ namespace BlessLoader
                 //Console.WriteLine("");
                 System.Threading.Thread.Sleep(500);
             }
+        }
+
+        // Detect If Steam Is Running
+        private static bool SteamDetection()
+        {
+            // Get Process List
+            Process[] processlist = Process.GetProcesses();
+            // Loop Through The List To Find Steam
+            foreach (Process theprocess in processlist)
+            {
+                // Check If The Process Name Is Steam
+                if (theprocess.ProcessName == "Steam")
+                {
+                    ConsoleWrite("Steam Check: Passed\n");
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static string ConsoleRead()
